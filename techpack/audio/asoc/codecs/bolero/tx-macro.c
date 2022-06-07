@@ -848,7 +848,147 @@ static int rx_macro_set_port_map(struct snd_soc_component *component,
 	port_cfg.size = size;
 	port_cfg.params = data;
 
+<<<<<<< HEAD
 	if (rx_priv->swr_ctrl_data)
+=======
+static int tx_macro_va_swr_clk_event(struct snd_soc_dapm_widget *w,
+			       struct snd_kcontrol *kcontrol, int event)
+{
+	struct device *tx_dev = NULL;
+	struct tx_macro_priv *tx_priv = NULL;
+	struct snd_soc_component *component =
+				snd_soc_dapm_to_component(w->dapm);
+
+	if (!tx_macro_get_data(component, &tx_dev, &tx_priv, __func__))
+		return -EINVAL;
+
+	if (SND_SOC_DAPM_EVENT_ON(event))
+		++tx_priv->va_swr_clk_cnt;
+	if (SND_SOC_DAPM_EVENT_OFF(event))
+		--tx_priv->va_swr_clk_cnt;
+
+	return 0;
+}
+
+static int tx_macro_tx_swr_clk_event(struct snd_soc_dapm_widget *w,
+			       struct snd_kcontrol *kcontrol, int event)
+{
+	struct device *tx_dev = NULL;
+	struct tx_macro_priv *tx_priv = NULL;
+	struct snd_soc_component *component =
+				snd_soc_dapm_to_component(w->dapm);
+
+	if (!tx_macro_get_data(component, &tx_dev, &tx_priv, __func__))
+		return -EINVAL;
+
+	if (SND_SOC_DAPM_EVENT_ON(event))
+		++tx_priv->tx_swr_clk_cnt;
+	if (SND_SOC_DAPM_EVENT_OFF(event))
+		--tx_priv->tx_swr_clk_cnt;
+
+	return 0;
+}
+
+static int tx_macro_mclk_event(struct snd_soc_dapm_widget *w,
+			       struct snd_kcontrol *kcontrol, int event)
+{
+	struct snd_soc_component *component =
+				snd_soc_dapm_to_component(w->dapm);
+	int ret = 0;
+	struct device *tx_dev = NULL;
+	struct tx_macro_priv *tx_priv = NULL;
+
+	if (!tx_macro_get_data(component, &tx_dev, &tx_priv, __func__))
+		return -EINVAL;
+
+	dev_dbg(tx_dev, "%s: event = %d\n", __func__, event);
+	switch (event) {
+	case SND_SOC_DAPM_PRE_PMU:
+		ret = tx_macro_mclk_enable(tx_priv, 1);
+		if (ret)
+			tx_priv->dapm_mclk_enable = false;
+		else
+			tx_priv->dapm_mclk_enable = true;
+		break;
+	case SND_SOC_DAPM_POST_PMD:
+		if (tx_priv->dapm_mclk_enable)
+			ret = tx_macro_mclk_enable(tx_priv, 0);
+		break;
+	default:
+		dev_err(tx_priv->dev,
+			"%s: invalid DAPM event %d\n", __func__, event);
+		ret = -EINVAL;
+	}
+	return ret;
+}
+
+static int tx_macro_event_handler(struct snd_soc_component *component,
+				u16 event, u32 data)
+{
+	struct device *tx_dev = NULL;
+	struct tx_macro_priv *tx_priv = NULL;
+	int ret = 0;
+
+	if (!tx_macro_get_data(component, &tx_dev, &tx_priv, __func__))
+		return -EINVAL;
+
+	switch (event) {
+	case BOLERO_MACRO_EVT_SSR_DOWN:
+		if (tx_priv->swr_ctrl_data) {
+			swrm_wcd_notify(
+				tx_priv->swr_ctrl_data[0].tx_swr_pdev,
+				SWR_DEVICE_SSR_DOWN, NULL);
+		}
+		if ((!pm_runtime_enabled(tx_dev) ||
+		     !pm_runtime_suspended(tx_dev))) {
+			ret = bolero_runtime_suspend(tx_dev);
+			if (!ret) {
+				pm_runtime_disable(tx_dev);
+				pm_runtime_set_suspended(tx_dev);
+				pm_runtime_enable(tx_dev);
+			}
+		}
+		break;
+	case BOLERO_MACRO_EVT_SSR_UP:
+		/* reset swr after ssr/pdr */
+		tx_priv->reset_swr = true;
+		if (tx_priv->swr_ctrl_data)
+			swrm_wcd_notify(
+				tx_priv->swr_ctrl_data[0].tx_swr_pdev,
+				SWR_DEVICE_SSR_UP, NULL);
+		break;
+	case BOLERO_MACRO_EVT_CLK_RESET:
+		bolero_rsc_clk_reset(tx_dev, TX_CORE_CLK);
+		break;
+	case BOLERO_MACRO_EVT_BCS_CLK_OFF:
+		if (tx_priv->bcs_clk_en)
+			snd_soc_component_update_bits(component,
+				BOLERO_CDC_TX0_TX_PATH_SEC7, 0x40, data << 6);
+		if (data)
+			tx_priv->hs_slow_insert_complete = true;
+		else
+			tx_priv->hs_slow_insert_complete = false;
+		break;
+	default:
+		pr_debug("%s Invalid Event\n", __func__);
+		break;
+	}
+	return 0;
+}
+
+static int tx_macro_reg_wake_irq(struct snd_soc_component *component,
+				 u32 data)
+{
+	struct device *tx_dev = NULL;
+	struct tx_macro_priv *tx_priv = NULL;
+	u32 ipc_wakeup = data;
+	int ret = 0;
+
+	if (!tx_macro_get_data(component, &tx_dev, &tx_priv, __func__))
+		return -EINVAL;
+
+	if (tx_priv->swr_ctrl_data)
+>>>>>>> 386b2b17ffff (BACKPORT: audio-kernel: Disable clock voting logs)
 		ret = swrm_wcd_notify(
 			rx_priv->swr_ctrl_data[0].rx_swr_pdev,
 			SWR_SET_PORT_MAP, &port_cfg);
@@ -1206,11 +1346,187 @@ static int rx_macro_digital_mute(struct snd_soc_dai *dai, int mute)
 			}
 		}
 	}
+<<<<<<< HEAD
 		break;
 	default:
 		break;
 	}
 	return 0;
+=======
+
+	return ret;
+}
+
+static int tx_macro_tx_va_mclk_enable(struct tx_macro_priv *tx_priv,
+				      struct regmap *regmap, int clk_type,
+				      bool enable)
+{
+	int ret = 0, clk_tx_ret = 0;
+
+	dev_dbg(tx_priv->dev,
+		"%s: clock type %s, enable: %s tx_mclk_users: %d\n",
+		__func__, (clk_type ? "VA_MCLK" : "TX_MCLK"),
+		(enable ? "enable" : "disable"), tx_priv->tx_mclk_users);
+
+	if (enable) {
+		if (tx_priv->swr_clk_users == 0) {
+			ret = msm_cdc_pinctrl_select_active_state(
+						tx_priv->tx_swr_gpio_p);
+			if (ret < 0) {
+				dev_err_ratelimited(tx_priv->dev,
+					"%s: tx swr pinctrl enable failed\n",
+					__func__);
+				goto exit;
+			}
+			msm_cdc_pinctrl_set_wakeup_capable(
+					tx_priv->tx_swr_gpio_p, false);
+		}
+
+		clk_tx_ret = bolero_clk_rsc_request_clock(tx_priv->dev,
+						   TX_CORE_CLK,
+						   TX_CORE_CLK,
+						   true);
+		if (clk_type == TX_MCLK) {
+			ret = tx_macro_mclk_enable(tx_priv, 1);
+			if (ret < 0) {
+				if (tx_priv->swr_clk_users == 0)
+					msm_cdc_pinctrl_select_sleep_state(
+							tx_priv->tx_swr_gpio_p);
+				dev_err_ratelimited(tx_priv->dev,
+					"%s: request clock enable failed\n",
+					__func__);
+				goto done;
+			}
+		}
+		if (clk_type == VA_MCLK) {
+			ret = bolero_clk_rsc_request_clock(tx_priv->dev,
+							   TX_CORE_CLK,
+							   VA_CORE_CLK,
+							   true);
+			if (ret < 0) {
+				if (tx_priv->swr_clk_users == 0)
+					msm_cdc_pinctrl_select_sleep_state(
+							tx_priv->tx_swr_gpio_p);
+				dev_err_ratelimited(tx_priv->dev,
+					"%s: swr request clk failed\n",
+					__func__);
+				goto done;
+			}
+			bolero_clk_rsc_fs_gen_request(tx_priv->dev,
+						  true);
+			if (tx_priv->tx_mclk_users == 0) {
+				regmap_update_bits(regmap,
+					BOLERO_CDC_TX_TOP_CSR_FREQ_MCLK,
+					0x01, 0x01);
+				regmap_update_bits(regmap,
+					BOLERO_CDC_TX_CLK_RST_CTRL_MCLK_CONTROL,
+					0x01, 0x01);
+				regmap_update_bits(regmap,
+					BOLERO_CDC_TX_CLK_RST_CTRL_FS_CNT_CONTROL,
+					0x01, 0x01);
+			}
+			tx_priv->tx_mclk_users++;
+		}
+		if (tx_priv->swr_clk_users == 0) {
+			dev_dbg(tx_priv->dev, "%s: reset_swr: %d\n",
+				__func__, tx_priv->reset_swr);
+			if (tx_priv->reset_swr)
+				regmap_update_bits(regmap,
+					BOLERO_CDC_TX_CLK_RST_CTRL_SWR_CONTROL,
+					0x02, 0x02);
+			regmap_update_bits(regmap,
+				BOLERO_CDC_TX_CLK_RST_CTRL_SWR_CONTROL,
+				0x01, 0x01);
+			if (tx_priv->reset_swr)
+				regmap_update_bits(regmap,
+					BOLERO_CDC_TX_CLK_RST_CTRL_SWR_CONTROL,
+					0x02, 0x00);
+			tx_priv->reset_swr = false;
+		}
+		if (!clk_tx_ret)
+			ret = bolero_clk_rsc_request_clock(tx_priv->dev,
+						   TX_CORE_CLK,
+						   TX_CORE_CLK,
+						   false);
+		tx_priv->swr_clk_users++;
+	} else {
+		if (tx_priv->swr_clk_users <= 0) {
+			dev_err_ratelimited(tx_priv->dev,
+				"tx swrm clock users already 0\n");
+			tx_priv->swr_clk_users = 0;
+			return 0;
+		}
+		clk_tx_ret = bolero_clk_rsc_request_clock(tx_priv->dev,
+						   TX_CORE_CLK,
+						   TX_CORE_CLK,
+						   true);
+		tx_priv->swr_clk_users--;
+		if (tx_priv->swr_clk_users == 0)
+			regmap_update_bits(regmap,
+				BOLERO_CDC_TX_CLK_RST_CTRL_SWR_CONTROL,
+				0x01, 0x00);
+		if (clk_type == TX_MCLK)
+			tx_macro_mclk_enable(tx_priv, 0);
+		if (clk_type == VA_MCLK) {
+			if (tx_priv->tx_mclk_users <= 0) {
+				dev_err(tx_priv->dev, "%s: clock already disabled\n",
+						__func__);
+				tx_priv->tx_mclk_users = 0;
+				goto tx_clk;
+			}
+			tx_priv->tx_mclk_users--;
+			if (tx_priv->tx_mclk_users == 0) {
+				regmap_update_bits(regmap,
+					BOLERO_CDC_TX_CLK_RST_CTRL_FS_CNT_CONTROL,
+					0x01, 0x00);
+				regmap_update_bits(regmap,
+					BOLERO_CDC_TX_CLK_RST_CTRL_MCLK_CONTROL,
+					0x01, 0x00);
+			}
+
+			bolero_clk_rsc_fs_gen_request(tx_priv->dev,
+						false);
+			ret = bolero_clk_rsc_request_clock(tx_priv->dev,
+							   TX_CORE_CLK,
+							   VA_CORE_CLK,
+							   false);
+			if (ret < 0) {
+				dev_err_ratelimited(tx_priv->dev,
+					"%s: swr request clk failed\n",
+					__func__);
+				goto done;
+			}
+		}
+tx_clk:
+		if (!clk_tx_ret)
+			ret = bolero_clk_rsc_request_clock(tx_priv->dev,
+						   TX_CORE_CLK,
+						   TX_CORE_CLK,
+						   false);
+		if (tx_priv->swr_clk_users == 0) {
+			msm_cdc_pinctrl_set_wakeup_capable(
+					tx_priv->tx_swr_gpio_p, true);
+			ret = msm_cdc_pinctrl_select_sleep_state(
+						tx_priv->tx_swr_gpio_p);
+			if (ret < 0) {
+				dev_err_ratelimited(tx_priv->dev,
+					"%s: tx swr pinctrl disable failed\n",
+					__func__);
+				goto exit;
+			}
+		}
+	}
+	return 0;
+
+done:
+	if (!clk_tx_ret)
+		bolero_clk_rsc_request_clock(tx_priv->dev,
+				TX_CORE_CLK,
+				TX_CORE_CLK,
+				false);
+exit:
+	return ret;
+>>>>>>> 386b2b17ffff (BACKPORT: audio-kernel: Disable clock voting logs)
 }
 
 static int rx_macro_mclk_enable(struct rx_macro_priv *rx_priv,
@@ -3712,7 +4028,15 @@ static int rx_swrm_clock(void *handle, bool enable)
 		return -EINVAL;
 	}
 
+<<<<<<< HEAD
 	mutex_lock(&rx_priv->swr_clk_lock);
+=======
+	mutex_lock(&tx_priv->swr_clk_lock);
+	dev_dbg(tx_priv->dev,
+		"%s: swrm clock %s tx_swr_clk_cnt: %d va_swr_clk_cnt: %d\n",
+		__func__, (enable ? "enable" : "disable"),
+		tx_priv->tx_swr_clk_cnt, tx_priv->va_swr_clk_cnt);
+>>>>>>> 386b2b17ffff (BACKPORT: audio-kernel: Disable clock voting logs)
 
 	dev_dbg(rx_priv->dev, "%s: swrm clock %s\n",
 		__func__, (enable ? "enable" : "disable"));
@@ -3780,10 +4104,20 @@ static int rx_swrm_clock(void *handle, bool enable)
 			}
 		}
 	}
+<<<<<<< HEAD
 	dev_dbg(rx_priv->dev, "%s: swrm clock users %d\n",
 		__func__, rx_priv->swr_clk_users);
 exit:
 	mutex_unlock(&rx_priv->swr_clk_lock);
+=======
+
+	dev_dbg(tx_priv->dev,
+		"%s: swrm clock users %d tx_clk_sts_cnt: %d va_clk_sts_cnt: %d\n",
+		__func__, tx_priv->swr_clk_users, tx_priv->tx_clk_status,
+		tx_priv->va_clk_status);
+done:
+	mutex_unlock(&tx_priv->swr_clk_lock);
+>>>>>>> 386b2b17ffff (BACKPORT: audio-kernel: Disable clock voting logs)
 	return ret;
 }
 
