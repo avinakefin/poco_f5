@@ -22,6 +22,7 @@ supported.versions=
 block=/dev/block/bootdevice/by-name/boot;
 is_slot_device=1;
 ramdisk_compression=auto;
+patch_vbmeta_flag=auto;
 
 
 ## AnyKernel methods (DO NOT CHANGE)
@@ -36,6 +37,7 @@ set_perm_recursive 0 0 750 750 $ramdisk/*;
 
 ## AnyKernel install
 dump_boot;
+flash_dtbo;
 
 # Begin Ramdisk Changes
 
