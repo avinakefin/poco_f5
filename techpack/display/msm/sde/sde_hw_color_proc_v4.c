@@ -8,9 +8,9 @@
 #include "sde_hw_color_proc_common_v4.h"
 #include "sde_hw_color_proc_v4.h"
 
-static unsigned short kcal_red = 256;
-static unsigned short kcal_green = 215;
-static unsigned short kcal_blue = 200;
+static unsigned short kcal_red = 250;
+static unsigned short kcal_green = 250;
+static unsigned short kcal_blue = 250;
 static unsigned short kcal_hue = 0;
 static unsigned short kcal_sat = 245;
 static unsigned short kcal_val = 245;
