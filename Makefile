@@ -1,11 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0
 VERSION = 4
 PATCHLEVEL = 19
-<<<<<<< HEAD
-SUBLEVEL = 289
-=======
-SUBLEVEL = 290
->>>>>>> refs/remotes/origin/alioth
+SUBLEVEL = 291
 EXTRAVERSION =
 NAME = "People's Front"
 
