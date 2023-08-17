@@ -51,7 +51,7 @@ KERVER=$(make kernelversion)
 COMMIT_HEAD=$(git log --oneline -1)
 
 # Date and Time
-DATE=$(TZ=Europe/Lisbon date +"%Y%m%d-%T")
+DATE=$(TZ=Asia/Jakarta date +"%Y%m%d-%T")
 TM=$(date +"%F%S")
 
 # Specify Final Zip Name
@@ -122,9 +122,9 @@ function cloneTC() {
         # Clone AnyKernel
 		rm -rf AnyKernel3
 		if [ "${DEVICE}" = "alioth" ]; then
-                git clone --depth=1 https://github.com/avinakefin/AnyKernel3 -b samsoe AnyKernel3
+                git clone --depth=1 -b samsoe https://github.com/avinakefin/AnyKernel3 AnyKernel3
                 elif [ "${DEVICE}" = "munch" ]; then
-                git clone --depth=1 https://github.com/NotZeetaa/AnyKernel3 -b yaknah AnyKernel3
+                git clone --depth=1 -b yaknah https://github.com/avinakefin/AnyKernel3 AnyKernel3
 		fi
 	}
 	
@@ -328,10 +328,6 @@ function move() {
 }
 
 function move_ksu() {
-        
-        cd AnyKermel3 
-	mkdir ksu
-        cd .. || exit
 	mv $IMAGE AnyKernel3/ksu/
 }
 
