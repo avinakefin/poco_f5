@@ -31,7 +31,7 @@ VERSION=BETA
 if [ "${DEVICE}" = "alioth" ]; then
 DEFCONFIG=alioth_defconfig
 MODEL="Poco F3"
-else [ "${DEVICE}" = "munch" ]; then
+elif [ "${DEVICE}" = "munch" ]; then
 DEFCONFIG=munch_defconfig
 MODEL="Poco F4"
 fi
@@ -55,8 +55,8 @@ DATE=$(TZ=Europe/Lisbon date +"%Y%m%d-%T")
 TM=$(date +"%F%S")
 
 # Specify Final Zip Name
-ZIPNAME=Nexus
-FINAL_ZIP=${ZIPNAME}-${VERSION}-${DEVICE}-RC1.0-KERNEL-AOSP-${TM}.zip
+ZIPNAME=Samsoe
+FINAL_ZIP=${ZIPNAME}-${VERSION}-${DEVICE}-${TM}.zip
 
 # Specify compiler [ proton, nexus, aosp ]
 COMPILER=neutron
@@ -104,14 +104,14 @@ function cloneTC() {
 			
 		zyc)
 		    if [ ! -d clang ]; then
-				mkdir clang
-            	cd clang
+			mkdir clang
+            	        cd clang
 		    	wget https://raw.githubusercontent.com/ZyCromerZ/Clang/main/Clang-16-lastbuild.txt
 		    	V="$(cat Clang-16-lastbuild.txt)"
-            	wget -q https://github.com/ZyCromerZ/Clang/releases/download/16.0.4-$V-release/Clang-16.0.4-$V.tar.gz
+            	        wget -q https://github.com/ZyCromerZ/Clang/releases/download/16.0.4-$V-release/Clang-16.0.4-$V.tar.gz
 	        	tar -xf Clang-16.0.4-$V.tar.gz
 	        	cd ..
-				fi
+			fi
 	        	PATH="${KERNEL_DIR}/clang/bin:$PATH"
 	        ;;
 
@@ -122,9 +122,9 @@ function cloneTC() {
         # Clone AnyKernel
 		rm -rf AnyKernel3
 		if [ "${DEVICE}" = "alioth" ]; then
-          git clone --depth=1 https://github.com/avinakefin/AnyKernel3 -b samsoe AnyKernel3
-        else [ "${DEVICE}" = "munch" ]; then
-          git clone --depth=1 https://github.com/NotZeetaa/AnyKernel3 -b yaknah AnyKernel3
+                git clone --depth=1 https://github.com/avinakefin/AnyKernel3 -b samsoe AnyKernel3
+                elif [ "${DEVICE}" = "munch" ]; then
+                git clone --depth=1 https://github.com/NotZeetaa/AnyKernel3 -b yaknah AnyKernel3
 		fi
 	}
 	
@@ -195,7 +195,7 @@ METHOD=$3
 function compile() {
 START=$(date +"%s")
 	# Push Notification
-	post_msg "<b>$KBUILD_BUILD_VERSION CI Build Triggered</b>%0A<b>Docker OS: </b><code>$DISTRO</code>%0A<b>Kernel Version : </b><code>$KERVER</code>%0A<b>Date : </b><code>$(TZ=Europe/Lisbon date)</code>%0A<b>Device : </b><code>$MODEL [$DEVICE]</code>%0A<b>Pipeline Host : </b><code>$KBUILD_BUILD_HOST</code>%0A<b>Host Core Count : </b><code>$PROCS</code>%0A<b>Compiler Used : </b><code>$KBUILD_COMPILER_STRING</code>%0A<b>Branch : </b><code>$CI_BRANCH</code>%0A<b>Top Commit : </b><a href='$DRONE_COMMIT_LINK'>$COMMIT_HEAD</a>"
+	post_msg "<b>$KBUILD_BUILD_VERSION CI Build Triggered</b>%0A<b>Docker OS: </b><code>$DISTRO</code>%0A<b>Kernel Version : </b><code>$KERVER</code>%0A<b>Date : </b><code>$(TZ=Europe/Lisbon date)</code>%0A<b>Device : </b><code>$MODEL [$DEVICE]</code>%0A<b>Pipeline : </b><code>$KBUILD_BUILD_HOST</code>%0A<b>Host Core Count : </b><code>$PROCS</code>%0A<b>Compiler Used : </b><code>$KBUILD_COMPILER_STRING</code>%0A<b>Branch : </b><code>$CI_BRANCH</code>%0A<b>Top Commit : </b><a href='$DRONE_COMMIT_LINK'>$COMMIT_HEAD</a>"
 	
 	# Compile
 	if [ -d ${KERNEL_DIR}/clang ];
@@ -213,10 +213,10 @@ START=$(date +"%s")
 	       CROSS_COMPILE=aarch64-linux-gnu- \
 	       CROSS_COMPILE_COMPAT=arm-linux-gnueabi- \
 	       V=$VERBOSE 2>&1 | tee error.log
-	elif [ -d ${KERNEL_DIR}/gcc64 ];
+	   elif [ -d ${KERNEL_DIR}/gcc64 ];
 	   then
            make O=out ARCH=arm64 ${DEFCONFIG}
-	       make -kj$(nproc --all) O=out \
+	   make -kj$(nproc --all) O=out \
 	       ARCH=arm64 \
 	       CROSS_COMPILE_COMPAT=arm-eabi- \
 	       CROSS_COMPILE=aarch64-elf- \
@@ -227,7 +227,7 @@ START=$(date +"%s")
 	       STRIP=llvm-strip \
 	       OBJSIZE=llvm-size \
 	       V=$VERBOSE 2>&1 | tee error.log
-        elif [ -d ${KERNEL_DIR}/clangB ];
+           elif [ -d ${KERNEL_DIR}/clangB ];
            then
            make O=out CC=clang ARCH=arm64 ${DEFCONFIG}
 		   if [ "$METHOD" = "lto" ]; then
@@ -257,6 +257,7 @@ START=$(date +"%s")
 	}
 	
 function compile_ksu() {
+post_msg " building KSU Started "
 START=$(date +"%s")
 	# Compile
 	if [ -d ${KERNEL_DIR}/clang ];
@@ -267,7 +268,7 @@ START=$(date +"%s")
              -e LTO_CLANG \
              -d THINLTO
            fi
-	       make -kj$(nproc --all) O=out \
+	   make -kj$(nproc --all) O=out \
 	       ARCH=arm64 \
 	       LLVM=1 \
 	       LLVM_IAS=1 \
@@ -277,7 +278,7 @@ START=$(date +"%s")
 	elif [ -d ${KERNEL_DIR}/gcc64 ];
 	   then
            make O=out ARCH=arm64 ${DEFCONFIG}
-	       make -kj$(nproc --all) O=out \
+	   make -kj$(nproc --all) O=out \
 	       ARCH=arm64 \
 	       CROSS_COMPILE_COMPAT=arm-eabi- \
 	       CROSS_COMPILE=aarch64-elf- \
@@ -293,9 +294,9 @@ START=$(date +"%s")
            make O=out CC=clang ARCH=arm64 ${DEFCONFIG}
 		   if [ "$METHOD" = "lto" ]; then
 		     scripts/config --file ${OUT_DIR}/.config \
-             -e LTO_CLANG \
-             -d THINLTO
-           fi
+                     -e LTO_CLANG \
+                     -d THINLTO
+                   fi
            make -kj$(nproc --all) O=out \
 	       ARCH=arm64 \
 	       LLVM=1 \
@@ -322,11 +323,15 @@ START=$(date +"%s")
 function move() {
 	# Copy Files To AnyKernel3 Zip
 	mv $IMAGE AnyKernel3
-    mv $DTBO AnyKernel3
-    mv $DTB AnyKernel3
+        mv $DTBO AnyKernel3
+        mv $DTB AnyKernel3
 }
 
 function move_ksu() {
+        
+        cd AnyKermel3 
+	mkdir ksu
+        cd .. || exit
 	mv $IMAGE AnyKernel3/ksu/
 }
 
