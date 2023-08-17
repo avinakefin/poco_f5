@@ -31,7 +31,7 @@ VERSION=BETA
 if [ "${DEVICE}" = "alioth" ]; then
 DEFCONFIG=alioth_defconfig
 MODEL="Poco F3"
-else [ "${DEVICE}" = "munch" ]; then
+elif [ "${DEVICE}" = "munch" ]; then
 DEFCONFIG=munch_defconfig
 MODEL="Poco F4"
 fi
@@ -122,9 +122,9 @@ function cloneTC() {
         # Clone AnyKernel
 		rm -rf AnyKernel3
 		if [ "${DEVICE}" = "alioth" ]; then
-          git clone --depth=1 https://github.com/avinakefin/AnyKernel3 -b samsoe AnyKernel3
-        else [ "${DEVICE}" = "munch" ]; then
-          git clone --depth=1 https://github.com/NotZeetaa/AnyKernel3 -b yaknah AnyKernel3
+                git clone --depth=1 https://github.com/avinakefin/AnyKernel3 -b samsoe AnyKernel3
+                else [ "${DEVICE}" = "munch" ]; then
+                git clone --depth=1 https://github.com/NotZeetaa/AnyKernel3 -b yaknah AnyKernel3
 		fi
 	}
 	
@@ -322,8 +322,8 @@ START=$(date +"%s")
 function move() {
 	# Copy Files To AnyKernel3 Zip
 	mv $IMAGE AnyKernel3
-    mv $DTBO AnyKernel3
-    mv $DTB AnyKernel3
+        mv $DTBO AnyKernel3
+        mv $DTB AnyKernel3
 }
 
 function move_ksu() {
