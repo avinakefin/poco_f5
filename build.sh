@@ -31,6 +31,7 @@ VERSION=BETA
 if [ "${DEVICE}" = "alioth" ]; then
 DEFCONFIG=alioth_defconfig
 MODEL="Poco F3"
+else [ "${DEVICE}" = "munch" ]; then
 DEFCONFIG=munch_defconfig
 MODEL="Poco F4"
 fi
