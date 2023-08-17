@@ -123,7 +123,7 @@ function cloneTC() {
 		rm -rf AnyKernel3
 		if [ "${DEVICE}" = "alioth" ]; then
                 git clone --depth=1 https://github.com/avinakefin/AnyKernel3 -b samsoe AnyKernel3
-                else [ "${DEVICE}" = "munch" ]; then
+                elif [ "${DEVICE}" = "munch" ]; then
                 git clone --depth=1 https://github.com/NotZeetaa/AnyKernel3 -b yaknah AnyKernel3
 		fi
 	}
