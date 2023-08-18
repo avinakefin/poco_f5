@@ -1,10 +1,6 @@
-<<<<<<< HEAD
 CONFIG_LOCALVERSION="-Samsoe-[3.3]"
 # CONFIG_LOCALVERSION_AUTO is not set
 # CONFIG_BRANCH_SHA is not set
-=======
-CONFIG_LOCALVERSION="~InfiniR_Alioth_v2.72"
->>>>>>> refs/remotes/origin/alioth
 # CONFIG_AUDIT is not set
 CONFIG_NO_HZ=y
 CONFIG_HIGH_RES_TIMERS=y

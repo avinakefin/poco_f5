@@ -4,15 +4,8 @@
  # Script For Building Android Kernel
  #
 
-<<<<<<< HEAD
 # Specify Kernel Directory
 KERNEL_DIR="$(pwd)"
-=======
-KERNEL_DEFCONFIG=alioth_defconfig
-ANYKERNEL3_DIR=$PWD/AnyKernel3/
-FINAL_KERNEL_ZIP=InfiniR_Alioth_v2.72.zip
-export ARCH=arm64
->>>>>>> refs/remotes/origin/alioth
 
 BUILD=$1
 
