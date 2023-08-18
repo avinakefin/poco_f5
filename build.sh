@@ -207,13 +207,11 @@ START=$(date +"%s")
              -d THINLTO
            fi
 	       make -kj$(nproc --all) O=out \
-	       CC=clang \
-	       AR=llvm-ar \
-           NM=llvm-nm \
-           OBJCOPY=llvm-objcopy \
-           OBJDUMP=llvm-objdump \
-	       STRIP=llvm-strip \
-           CROSS_COMPILE=aarch64-linux-gnu- \
+	       ARCH=arm64 \
+	       LLVM=1 \
+	       LLVM_IAS=1 \
+	       CROSS_COMPILE=aarch64-linux-gnu- \
+	       CROSS_COMPILE_COMPAT=arm-linux-gnueabi- \
 	       V=$VERBOSE 2>&1 | tee error.log
 	   elif [ -d ${KERNEL_DIR}/gcc64 ];
 	   then
@@ -329,10 +327,6 @@ function move() {
         mv $DTB AnyKernel3
 }
 
-function move_ksu() {
-	mv $IMAGE AnyKernel3/ksu/
-}
-
 function zipping() {
 # Zipping and Push Kernel
 	cd AnyKernel3 || exit 1
@@ -349,13 +343,4 @@ compile
 END=$(date +"%s")
 DIFF=$(($END - $START))
 move
-# KernelSU
-echo "CONFIG_KSU=y" >> $(pwd)/arch/arm64/configs/$DEFCONFIG
-compile_ksu
-move_ksu
 zipping
-if [ "$BUILD" = "local" ]; then
-# Discard KSU changes in defconfig
-git restore arch/arm64/configs/$DEFCONFIGf
-fi
-
