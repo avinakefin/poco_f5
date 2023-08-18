@@ -207,11 +207,13 @@ START=$(date +"%s")
              -d THINLTO
            fi
 	       make -kj$(nproc --all) O=out \
-	       ARCH=arm64 \
-	       LLVM=1 \
-	       LLVM_IAS=1 \
-	       CROSS_COMPILE=aarch64-linux-gnu- \
-	       CROSS_COMPILE_COMPAT=arm-linux-gnueabi- \
+	       CC=clang \
+	       AR=llvm-ar \
+           NM=llvm-nm \
+           OBJCOPY=llvm-objcopy \
+           OBJDUMP=llvm-objdump \
+	       STRIP=llvm-strip \
+           CROSS_COMPILE=aarch64-linux-gnu- \
 	       V=$VERBOSE 2>&1 | tee error.log
 	   elif [ -d ${KERNEL_DIR}/gcc64 ];
 	   then
