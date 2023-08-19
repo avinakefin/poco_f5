@@ -198,7 +198,7 @@ START=$(date +"%s")
 	post_msg "<b>$KBUILD_BUILD_VERSION CI Build Triggered</b>%0A<b>Docker OS: </b><code>$DISTRO</code>%0A<b>Kernel Version : </b><code>$KERVER</code>%0A<b>Date : </b><code>$(TZ=Europe/Lisbon date)</code>%0A<b>Device : </b><code>$MODEL [$DEVICE]</code>%0A<b>Pipeline : </b><code>$KBUILD_BUILD_HOST</code>%0A<b>Host Core Count : </b><code>$PROCS</code>%0A<b>Compiler Used : </b><code>$KBUILD_COMPILER_STRING</code>%0A<b>Branch : </b><code>$CI_BRANCH</code>%0A<b>Top Commit : </b><a href='$DRONE_COMMIT_LINK'>$COMMIT_HEAD</a>"
 	
 	# Compile
-	if [ -d ${KERNEL_DIR}/clang ];
+	if [ -d ${KERNEL_DIR}/gcc ];
 	   then
            make O=out CC=clang ARCH=arm64 ${DEFCONFIG}
 		   if [ "$METHOD" = "lto" ]; then
@@ -213,7 +213,7 @@ START=$(date +"%s")
 	       CROSS_COMPILE=aarch64-linux-gnu- \
 	       CROSS_COMPILE_COMPAT=arm-linux-gnueabi- \
 	       V=$VERBOSE 2>&1 | tee error.log
-	   elif [ -d ${KERNEL_DIR}/gcc64 ];
+	   elif [ -d ${KERNEL_DIR}/clang ];
 	   then
            make O=out ARCH=arm64 ${DEFCONFIG}
 	   make -kj$(nproc --all) O=out \
