@@ -55,7 +55,7 @@ DATE=$(TZ=Asia/Jakarta date +"%Y%m%d-%T")
 TM=$(date +"%F%S")
 
 # Specify Final Zip Name
-ZIPNAME=yaknah
+ZIPNAME=samsoe
 FINAL_ZIP=${ZIPNAME}-${VERSION}-${DEVICE}-${TM}.zip
 
 # Specify compiler [ proton, nexus, aosp ]
