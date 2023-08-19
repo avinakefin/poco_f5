@@ -55,7 +55,7 @@ DATE=$(TZ=Asia/Jakarta date +"%Y%m%d-%T")
 TM=$(date +"%F%S")
 
 # Specify Final Zip Name
-ZIPNAME=Samsoe
+ZIPNAME=yaknah
 FINAL_ZIP=${ZIPNAME}-${VERSION}-${DEVICE}-${TM}.zip
 
 # Specify compiler [ proton, nexus, aosp ]
@@ -122,9 +122,9 @@ function cloneTC() {
         # Clone AnyKernel
 		rm -rf AnyKernel3
 		if [ "${DEVICE}" = "alioth" ]; then
-                git clone --depth=1 -b samsoe https://github.com/avinakefin/AnyKernel3 AnyKernel3
+                git clone --depth=1 -b ${ZIPNAME} https://github.com/avinakefin/AnyKernel3 AnyKernel3
                 elif [ "${DEVICE}" = "munch" ]; then
-                git clone --depth=1 -b yaknah https://github.com/avinakefin/AnyKernel3 AnyKernel3
+                git clone --depth=1 -b ${ZIPNAME} https://github.com/avinakefin/AnyKernel3 AnyKernel3
 		fi
 	}
 	
@@ -198,7 +198,7 @@ START=$(date +"%s")
 	post_msg "<b>$KBUILD_BUILD_VERSION CI Build Triggered</b>%0A<b>Docker OS: </b><code>$DISTRO</code>%0A<b>Kernel Version : </b><code>$KERVER</code>%0A<b>Date : </b><code>$(TZ=Europe/Lisbon date)</code>%0A<b>Device : </b><code>$MODEL [$DEVICE]</code>%0A<b>Pipeline : </b><code>$KBUILD_BUILD_HOST</code>%0A<b>Host Core Count : </b><code>$PROCS</code>%0A<b>Compiler Used : </b><code>$KBUILD_COMPILER_STRING</code>%0A<b>Branch : </b><code>$CI_BRANCH</code>%0A<b>Top Commit : </b><a href='$DRONE_COMMIT_LINK'>$COMMIT_HEAD</a>"
 	
 	# Compile
-	if [ -d ${KERNEL_DIR}/gcc ];
+	if [ -d ${KERNEL_DIR}/clang ];
 	   then
            make O=out CC=clang ARCH=arm64 ${DEFCONFIG}
 		   if [ "$METHOD" = "lto" ]; then
@@ -213,7 +213,7 @@ START=$(date +"%s")
 	       CROSS_COMPILE=aarch64-linux-gnu- \
 	       CROSS_COMPILE_COMPAT=arm-linux-gnueabi- \
 	       V=$VERBOSE 2>&1 | tee error.log
-	   elif [ -d ${KERNEL_DIR}/clang ];
+	   elif [ -d ${KERNEL_DIR}/gcc64 ];
 	   then
            make O=out ARCH=arm64 ${DEFCONFIG}
 	   make -kj$(nproc --all) O=out \
@@ -327,6 +327,10 @@ function move() {
         mv $DTB AnyKernel3
 }
 
+function move_ksu() {
+	mv $IMAGE AnyKernel3/ksu/
+}
+
 function zipping() {
 # Zipping and Push Kernel
 	cd AnyKernel3 || exit 1
@@ -343,4 +347,13 @@ compile
 END=$(date +"%s")
 DIFF=$(($END - $START))
 move
+# KernelSU
+echo "CONFIG_KSU=y" >> $(pwd)/arch/arm64/configs/$DEFCONFIG
+compile_ksu
+move_ksu
 zipping
+if [ "$BUILD" = "local" ]; then
+# Discard KSU changes in defconfig
+git restore arch/arm64/configs/$DEFCONFIGf
+fi
+
