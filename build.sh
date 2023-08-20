@@ -256,7 +256,6 @@ START=$(date +"%s")
 	fi
 	}
 	
-}
 
 # Zipping
 function move() {
