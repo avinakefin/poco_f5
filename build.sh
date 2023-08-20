@@ -264,10 +264,6 @@ function move() {
         mv $DTB AnyKernel3
 }
 
-function move_ksu() {
-	mv $IMAGE AnyKernel3/ksu/
-}
-
 function zipping() {
 # Zipping and Push Kernel
 	cd AnyKernel3 || exit 1
