@@ -57,7 +57,7 @@ ZIPNAME=samsoe
 FINAL_ZIP=${ZIPNAME}-${VERSION}-${DEVICE}-${TM}.zip
 
 # Specify compiler [ proton, nexus, aosp ]
-COMPILER=neutron
+COMPILER=zyc
 
 # Clone ToolChain
 function cloneTC() {
@@ -104,10 +104,10 @@ function cloneTC() {
 		    if [ ! -d clang ]; then
 			mkdir clang
             	        cd clang
-		    	wget https://raw.githubusercontent.com/ZyCromerZ/Clang/main/Clang-16-lastbuild.txt
-		    	V="$(cat Clang-16-lastbuild.txt)"
-            	        wget -q https://github.com/ZyCromerZ/Clang/releases/download/16.0.4-$V-release/Clang-16.0.4-$V.tar.gz
-	        	tar -xf Clang-16.0.4-$V.tar.gz
+		    	wget https://raw.githubusercontent.com/ZyCromerZ/Clang/main/Clang-main-lastbuild.txt
+		    	V="$(cat Clang-main-lastbuild.txt)"
+            	        wget q https://github.com/ZyCromerZ/Clang/releases/download/18.0.0-20230913-$V-release/Clang-18.0.0-20230913-$V.tar.gz
+	        	tar -xf Clang-18.0.0-20230913-$V.tar.gz
 	        	cd ..
 			fi
 	        	PATH="${KERNEL_DIR}/clang/bin:$PATH"
