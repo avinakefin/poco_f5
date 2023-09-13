@@ -57,7 +57,7 @@ ZIPNAME=samsoe
 FINAL_ZIP=${ZIPNAME}-${VERSION}-${DEVICE}-${TM}.zip
 
 # Specify compiler [ proton, nexus, aosp ]
-COMPILER=neutron
+COMPILER=zyc
 
 # Clone ToolChain
 function cloneTC() {
