@@ -3,8 +3,6 @@
  #
  # Script For Building Android Kernel
  #
-
-# Specify Kernel Directory
 KERNEL_DIR="$(pwd)"
 
 BUILD=$1
