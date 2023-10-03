@@ -1,4 +1,4 @@
-CONFIG_LOCALVERSION="-Samsoe-[3.4]"
+CONFIG_LOCALVERSION="-Samsoe-[3.5]"
 # CONFIG_LOCALVERSION_AUTO is not set
 # CONFIG_BRANCH_SHA is not set
 # CONFIG_AUDIT is not set

@@ -29,9 +29,9 @@ VERSION=BETA
 if [ "${DEVICE}" = "alioth" ]; then
 DEFCONFIG=alioth_defconfig
 MODEL="Poco F3"
-elif [ "${DEVICE}" = "munch" ]; then
-DEFCONFIG=munch_defconfig
-MODEL="Poco F4"
+elif [ "${DEVICE}" = "alioth" ]; then
+DEFCONFIG=miui_defconfig
+MODEL="Poco F3 MIUI"
 fi
 
 # Files
