@@ -6,7 +6,6 @@
 KERNEL_DIR="$(pwd)"
 
 BUILD=$1
-
 if [ "$BUILD" = "local" ]; then
 	if [ -e ids.txt ]; then
 		chat_id=$(awk "NR==1{print;exit}" ids.txt)
