@@ -76,7 +76,7 @@ UTS_TRUNCATE="cut -b -$UTS_LEN"
   CC_VERSION=$($CC -v 2>&1 | grep ' version ' | sed 's/Android..*clang/Android Clang/g' | sed 's/(https..*)//g' | sed 's/[[:space:]]*$//')
   LD_VERSION=$($LD -v | head -n1 | sed 's/(compatible with [^)]*)//' | sed 's/(..*)//g' \
 		      | sed 's/[[:space:]]*$//')
-  printf '#define LINUX_COMPILER "%s"\n' "CLo Tag LA.UM.9.12.1.r1-06700-SMxx50"
+  printf '#define LINUX_COMPILER "%s"\n' "CLo Tag LA.UM.9.12.r1-17600.04-SMxx50.QSSI14.0"
 ) > .tmpcompile
 
 # Only replace the real compile.h if the new one is different,
