@@ -52,19 +52,19 @@ DATE=$(TZ=Asia/Jakarta date +"%Y%m%d-%T")
 TM=$(date +"%F%S")
 
 # Specify Final Zip Name
-ZIPNAME=yaknah
+ZIPNAME=samsoe
 FINAL_ZIP=${ZIPNAME}-${VERSION}-${DEVICE}-${TM}.zip
 
 # Specify compiler [ proton, nexus, aosp ]
-COMPILER=sigarete
+COMPILER=neutron
 
 # Clone ToolChain
 function cloneTC() {
 	
 	case $COMPILER in
 	
-		sigarete)
-			git clone --depth=1 https://github.com/fajar4561/SignatureTC_Clang -b 15 clang
+		proton)
+			git clone --depth=1  https://github.com/kdrag0n/proton-clang.git clang
 			PATH="${KERNEL_DIR}/clang/bin:$PATH"
 			;;
 
@@ -205,13 +205,9 @@ START=$(date +"%s")
            fi
 	       make -kj$(nproc --all) O=out \
 	       ARCH=arm64 \
-	       CC=clang \
-	       AR=llvm-ar \
-           NM=llvm-nm \
-           OBJCOPY=llvm-objcopy \
-           OBJDUMP=llvm-objdump \
-	       STRIP=llvm-strip \
-           CROSS_COMPILE=aarch64-linux-gnu- \
+	       LLVM=1 \
+	       LLVM_IAS=1 \
+	       CROSS_COMPILE=aarch64-linux-gnu- \
 	       CROSS_COMPILE_COMPAT=arm-linux-gnueabi- \
 	       V=$VERBOSE 2>&1 | tee error.log
 	   elif [ -d ${KERNEL_DIR}/gcc64 ];
@@ -257,82 +253,6 @@ START=$(date +"%s")
 	fi
 	}
 	
-	function compile_ksu() {
-START=$(date +"%s")
-	# Compile
-	if [ -d ${KERNEL_DIR}/clang ];
-	   then
-           make O=out CC=clang ARCH=arm64 ${DEFCONFIG}
-		   if [ "$METHOD" = "lto" ]; then
-		     scripts/config --file ${OUT_DIR}/.config \
-             -e LTO_CLANG \
-             -d THINLTO
-           fi
-	       CC=clang \
-	       AR=llvm-ar \
-           NM=llvm-nm \
-           OBJCOPY=llvm-objcopy \
-           OBJDUMP=llvm-objdump \
-	       STRIP=llvm-strip \
-           CROSS_COMPILE=aarch64-linux-gnu- \
-	       CROSS_COMPILE_COMPAT=arm-linux-gnueabi- \
-	       V=$VERBOSE 2>&1 | tee error.log
-	elif [ -d ${KERNEL_DIR}/gcc64 ];
-	   then
-           make O=out ARCH=arm64 ${DEFCONFIG}
-	       make -kj$(nproc --all) O=out \
-	       ARCH=arm64 \
-	       CROSS_COMPILE_COMPAT=arm-eabi- \
-	       CROSS_COMPILE=aarch64-elf- \
-	       AR=llvm-ar \
-	       NM=llvm-nm \
-	       OBJCOPY=llvm-objcopy \
-	       OBJDUMP=llvm-objdump \
-	       STRIP=llvm-strip \
-	       OBJSIZE=llvm-size \
-	       V=$VERBOSE 2>&1 | tee error.log
-        elif [ -d ${KERNEL_DIR}/clangB ];
-           then
-           make O=out CC=clang ARCH=arm64 ${DEFCONFIG}
-		   if [ "$METHOD" = "lto" ]; then
-		     scripts/config --file ${OUT_DIR}/.config \
-             -e LTO_CLANG \
-             -d THINLTO
-           fi
-           make -kj$(nproc --all) O=out \
-	       ARCH=arm64 \
-	       LLVM=1 \
-	       LLVM_IAS=1 \
-	       CLANG_TRIPLE=aarch64-linux-gnu- \
-	       CROSS_COMPILE=aarch64-linux-android- \
-	       CROSS_COMPILE_COMPAT=arm-linux-androideabi- \
-	       V=$VERBOSE 2>&1 | tee error.log
-	fi
-	
-	# Verify Files
-	if ! [ -a "$IMAGE" ];
-	   then
-	       push "error.log" "Build Throws Errors"
-	       exit 1
-	   else
-	       post_msg " Kernel Compilation Finished. Started Zipping "
-		   find ${OUT_DIR}/$dts_source -name '*.dtb' -exec cat {} + >${OUT_DIR}/arch/arm64/boot/dtb
-		   DTB=$(pwd)/out/arch/arm64/boot/dtb
-	fi
-}
-
-# Zipping
-function move() {
-	# Copy Files To AnyKernel3 Zip
-	mv $IMAGE AnyKernel3
-    mv $DTBO AnyKernel3
-    mv $DTB AnyKernel3
-}
-
-function move_ksu() {
-	mv $IMAGE AnyKernel3/ksu/
-}
-	
 # Zipping
 function move() {
 	# Copy Files To AnyKernel3 Zip
@@ -357,12 +277,4 @@ compile
 END=$(date +"%s")
 DIFF=$(($END - $START))
 move
-# KernelSU
-echo "CONFIG_KSU=y" >> $(pwd)/arch/arm64/configs/$DEFCONFIG
-compile_ksu
-move_ksu
 zipping
-if [ "$BUILD" = "local" ]; then
-# Discard KSU changes in defconfig
-git restore arch/arm64/configs/$DEFCONFIGf
-fi
