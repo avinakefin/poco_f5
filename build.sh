@@ -56,7 +56,11 @@ ZIPNAME=samsoe
 FINAL_ZIP=${ZIPNAME}-${VERSION}-${DEVICE}-${TM}.zip
 
 # Specify compiler [ proton, nexus, aosp ]
+<<<<<<< HEAD
 COMPILER=zyc
+=======
+COMPILER=neutron
+>>>>>>> parent of 3aef99113344 (add ULPS k11a and l11r)
 
 # Clone ToolChain
 function cloneTC() {
