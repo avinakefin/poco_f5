@@ -1984,11 +1984,7 @@ static int dsi_panel_parse_phy_props(struct dsi_panel *panel)
 	const char *str;
 	struct dsi_panel_phy_props *props = &panel->phy_props;
 	struct dsi_parser_utils *utils = &panel->utils;
-<<<<<<< HEAD
-	const __maybe_unused char *name = panel->name;
-=======
->>>>>>> 0ce01f18bc94 (techpack: display: clean up)
-
+	
 	rc = utils->read_u32(utils->data,
 		  "qcom,mdss-pan-physical-width-dimension", &val);
 	if (rc) {
