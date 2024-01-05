@@ -22,3 +22,5 @@ config TECHPACK_CAMERA_XIAOMI_TABLET
       Xiaomi camera tablet
 
 endmenu
+
+endmenu
