@@ -848,9 +848,8 @@ static int rx_macro_set_port_map(struct snd_soc_component *component,
 	port_cfg.size = size;
 	port_cfg.params = data;
 
-<<<<<<< HEAD
 	if (rx_priv->swr_ctrl_data)
-=======
+
 static int tx_macro_va_swr_clk_event(struct snd_soc_dapm_widget *w,
 			       struct snd_kcontrol *kcontrol, int event)
 {
