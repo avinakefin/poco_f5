@@ -1568,10 +1568,7 @@ static int afe_apr_send_pkt(void *data, wait_queue_head_t *wait)
 				pr_err_ratelimited("%s: request timedout\n",
 					__func__);
 				ret = -ETIMEDOUT;
-<<<<<<< HEAD
 
-=======
->>>>>>> 386b2b17ffff (BACKPORT: audio-kernel: Disable clock voting logs)
 			} else if (atomic_read(&this_afe.status) > 0) {
 				pr_err("%s: DSP returned error[%s]\n", __func__,
 					adsp_err_get_err_str(atomic_read(
